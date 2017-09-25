@@ -20,6 +20,7 @@ namespace Kvant::graphics::opengl {
     class Backend : public blueprints::graphics::Backend<Backend<PLATFORM>>, Screen::Subscriber {
         public:
             using Pipeline = OpenglPipeline<Backend, PLATFORM>;
+            using BasePipeline = OpenglPipeline<Backend, PLATFORM>;
             using CBackend = Backend<PLATFORM>;
             using Surface = OpenglSurface<CBackend>;
 
