@@ -11,9 +11,9 @@
 #include "utils/Checks.hpp"
 #include "core/Mesh.hpp"
 
-#include "OpenglBuffer.hpp"
-#include "OpenglShader.hpp"
-#include "OpenglSurface.hpp"
+#include "backends/opengl/OpenglBuffer.hpp"
+#include "backends/opengl/OpenglShader.hpp"
+#include "backends/opengl/OpenglSurface.hpp"
 
 namespace Kvant::graphics::opengl {
     template <typename PLATFORM>
@@ -23,6 +23,7 @@ namespace Kvant::graphics::opengl {
             using BasePipeline = OpenglPipeline<Backend, PLATFORM>;
             using CBackend = Backend<PLATFORM>;
             using Surface = OpenglSurface<CBackend>;
+            using Texture = OpenglTexture<CBackend>;
 
             static const OpenglRenderPassClearCmd clear;
             static const OpenglScreenBuffer<Backend> screen_buffer;

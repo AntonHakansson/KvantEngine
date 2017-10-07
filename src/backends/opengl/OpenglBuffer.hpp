@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "core/Context.hpp"
+#include "utils/Checks.hpp"
 
 namespace Kvant::graphics::opengl {
 
@@ -80,6 +81,35 @@ namespace Kvant::graphics::opengl {
             GLuint _buffer = 0;
             unsigned int _w, _h;
     };
+
+    template <typename B>
+    struct OpenglTexture : OpenglColorBuffer<B> {
+        OpenglTexture(const GraphicsContext<B>& ctx, std::string filename);
+        void create_texture(const char* filename);
+    };
+
+    template <typename B>
+    OpenglTexture<B>::OpenglTexture(const GraphicsContext<B>& ctx, std::string filename) {
+        create_texture(filename.c_str());
+    }
+
+    template <typename B>
+    void OpenglTexture<B>::create_texture(const char* filename) {
+        unsigned char* img;
+        unsigned int ww, hh;
+        GL_CHECK(glBindTexture(GL_TEXTURE_2D, this->tex));
+        if (load_png_for_texture(&img, &ww, &hh, filename)) {
+            GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+            GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+            GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+            GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+            GL_CHECK(
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ww, hh, 0, GL_RGBA, GL_UNSIGNED_BYTE, img));
+            free(img);
+            this->width = ww;
+            this->height = hh;
+        }
+    }
 
     template <typename GRAPHICS>
     class OpenglScreenBuffer : public OpenglBaseBuffer<GRAPHICS> {};

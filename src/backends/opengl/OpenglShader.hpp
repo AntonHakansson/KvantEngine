@@ -3,8 +3,8 @@
 
 #include <glm/glm.hpp>
 
-#include "OpenglSurface.hpp"
-#include "OpenglBuffer.hpp"
+#include "backends/opengl/OpenglSurface.hpp"
+#include "backends/opengl/OpenglBuffer.hpp"
 
 namespace Kvant::graphics::opengl {
 

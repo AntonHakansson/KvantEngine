@@ -29,6 +29,7 @@ endif()
 set(SOURCE_FILES
      ${SOURCE_FILES}
         src/utils/Logger.hpp
+        src/core/Loader.cpp
         src/imgui/imgui.cpp
         src/imgui/imgui_draw.cpp
         src/imgui/imgui_kvant.cpp

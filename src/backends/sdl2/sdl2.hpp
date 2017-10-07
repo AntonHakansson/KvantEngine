@@ -7,7 +7,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengles.h>
 
-#include "Platform.hpp"
+#include "backends/blueprints/Platform.hpp"
 
 namespace Kvant::platform::sdl {
     static int YAGL_TO_SDL_KEY[1024] =

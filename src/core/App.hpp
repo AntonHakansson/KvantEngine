@@ -11,6 +11,10 @@
 
 #include "utils/Logger.hpp"
 #include "core/Scene.hpp"
+#include "core/Shaders.hpp"
+#include "core/Traits.hpp"
+#include "core/Drawable.hpp"
+#include "Shaders.hpp"
 #include "imgui/imgui_kvant.cpp"
 
 namespace Kvant {
@@ -26,6 +30,18 @@ namespace Kvant {
             static_assert(std::is_base_of<Kvant::blueprints::graphics::Backend<GRAPHICS<PLATFORM>>, GRAPHICS<Platform>>::value,
                         "platform");
             using Graphics = GRAPHICS<Platform>;
+
+            template <typename ACTUAL_ASSET>
+            using Asset = Kvant::Asset<ACTUAL_ASSET>;
+
+            template <typename ACTUAL_ASSET>
+            using Drawable = Kvant::Drawable<Graphics, ACTUAL_ASSET>;
+
+            using Texture = typename GRAPHICS<Platform>::Texture;
+
+            using ForwardPipeline = Kvant::ForwardPipeline<Graphics>;
+
+            using Material = Kvant::Material<Graphics>;
 
             using Context = CONTEXT<Platform, Graphics>;
 

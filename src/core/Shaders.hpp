@@ -1,6 +1,7 @@
 #ifndef SHADERS_HPP_INCLUDED
 #define SHADERS_HPP_INCLUDED
 
+
 namespace Kvant {
 
     template <typename GRAPHICS, typename S>
@@ -18,9 +19,9 @@ namespace Kvant {
     template <typename GRAPHICS>
     struct Material {
         Material(const GraphicsContext<GRAPHICS>& ctx,
-                 const typename GRAPHICS::texture* d,
-                 const typename GRAPHICS::texture* n,
-                 const typename GRAPHICS::texture* s)
+                 const typename GRAPHICS::Texture* d,
+                 const typename GRAPHICS::Texture* n,
+                 const typename GRAPHICS::Texture* s)
             : diffuse(d), normal(n), specular(s) { }
         
         template<typename SHADER>
@@ -28,9 +29,9 @@ namespace Kvant {
             s.set_material(*this);
         }
 
-        const typename GRAPHICS::texture* diffuse;
-        const typename GRAPHICS::texture* normal;
-        const typename GRAPHICS::texture* specular;
+        const typename GRAPHICS::Texture* diffuse;
+        const typename GRAPHICS::Texture* normal;
+        const typename GRAPHICS::Texture* specular;
     };
 
     
@@ -90,7 +91,7 @@ namespace Kvant {
                 return *this;
             }
 
-            void ForwardPipeline& set_material(const Material& solid_mat) const {
+            ForwardPipeline& set_material(const Material& solid_mat) const {
                 this->bind_sampler(_tex, solid_mat.diffuse);
                 this->bind_sampler(_tex, solid_mat.normal);
                 this->bind_sampler(_tex, solid_mat.specular);
@@ -118,6 +119,28 @@ namespace Kvant {
                                         18,                         // total floats per vertex
                                         (void*)(sizeof(float)*12));  // position in vertex
            }
+
+            const ForwardPipeline& set_modelview(glm::mat4 mvp) const {
+                this->bind_uniform(_mvp, mvp);
+                return *this;
+            }
+
+            const ForwardPipeline& set_eyepos(glm::vec3 eye) const {
+                this->bind_uniform(_eye, eye);
+                return *this;
+            }
+
+            template <typename CAMERA>
+            const ForwardPipeline& set_camera(const CAMERA& c) const {
+                // TODO: implement camera
+                set_eyepos(c.entity().pos);
+                set_modelview(c.entity().proj * c.get_transformable().get_transforms()[0]);
+                return *this;
+            }
+
+            void enable_vertex_attributes() const {
+                this->bind_vertex_attribs();
+            }
 
         private:
             typename GRAPHICS::BasePipeline::Sampler _tex;

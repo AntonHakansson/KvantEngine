@@ -3,8 +3,8 @@
 
 #include <glm/glm.hpp>
 
-#include "Mesh.hpp"
-#include "Context.hpp"
+#include "core/Mesh.hpp"
+#include "core/Context.hpp"
 
 namespace Kvant::blueprints::graphics {
 

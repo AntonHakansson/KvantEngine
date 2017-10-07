@@ -1,7 +1,7 @@
-#include "Screen.hpp"
-#include "sdl2.hpp"
+#include "core/Screen.hpp"
+#include "backends/sdl2/sdl2.hpp"
 #include "imgui/imgui.h"
-#include "imgui_impl_sdl.h"
+#include "backends/sdl2/imgui_impl_sdl.h"
 #include "utils/Checks.hpp"
 
 namespace Kvant::platform::sdl {
