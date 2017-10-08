@@ -5,6 +5,31 @@
 
 namespace Kvant {
 
+    template <typename CONTENT>
+    struct Container {
+        using etype = typename CONTENT::etype;
+        CONTENT _content;
+
+        CONTENT* content() { return &_content; }
+        const CONTENT* ccontent() const { return &_content; }
+
+        template <typename CONTEXT, typename... ZZ>
+        Container(const CONTEXT& ctx, ZZ&... rest) : _content(ctx, rest...) {
+        }
+
+        const etype& entity() const {
+            return static_cast<const etype&>(_content.entity());
+        }
+
+        etype* entity_ptr() {
+            return static_cast<etype*>(_content.entity_ptr());
+        }
+
+        operator etype() const {
+            return *static_cast<etype*>(_content.entity_ptr());
+        }
+    };
+
     template <typename ENTITY>
     struct IsEntity {
         using etype = ENTITY;
@@ -42,6 +67,18 @@ namespace Kvant {
 
         TDrivable* get_drivable_ptr() {
             return static_cast<TDrivable*>(*this);
+        }
+    };
+
+    template <typename TRANSFORMABLE>
+    struct IsTransformable {
+        using TTransformable = TRANSFORMABLE;
+        const TTransformable& get_transformable() const {
+            return static_cast<const TTransformable>(*this);
+        };
+
+        TTransformable* get_transformable_ptr() {
+            return static_cast<TTransformable*>(*this);
         }
     };
 
