@@ -96,6 +96,15 @@ namespace Kvant::graphics::opengl {
                 glDisableVertexAttribArray(1);
             }
 
+            glm::mat4* create_instance_buffer(glm::mat4** d, int c) {
+                *d = new glm::mat4[c];
+                _instance_bufs.push_back(*d);
+            }
+
+            void update_instance_buffer(glm::mat4* data, int c) {
+                
+            }
+
             bool created = false;
             GLuint quadVAO = 0;
             GLuint quadVBO;            
