@@ -31,7 +31,15 @@ class Moon : public my_app::Asset<Moon>,
 class SpaceScene : public my_app::Scene {
     public:
 
-        SpaceScene(const my_app::Context& ctx, Kvant::Screen* screen) : _moon(ctx, Kvant::pos::origin) {
+        SpaceScene(const my_app::Context& ctx, Kvant::Screen* screen) : _moon(ctx), _pipeline(ctx) {
+
+        }
+
+        void update(const my_app::Context& ctx) override {
+
+        }
+
+        void render(const my_app::Context& ctx) override {
 
         }
 
@@ -39,7 +47,6 @@ class SpaceScene : public my_app::Scene {
         Kvant::Instance<Moon> _moon;
         my_app::ForwardPipeline _pipeline;
 };
-
 
 int main() {
     try {
