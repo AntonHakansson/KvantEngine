@@ -89,7 +89,8 @@ namespace Kvant::graphics::opengl {
     };
 
     template <typename B>
-    OpenglTexture<B>::OpenglTexture(const GraphicsContext<B>& ctx, std::string filename) {
+    OpenglTexture<B>::OpenglTexture(const GraphicsContext<B>& ctx, std::string filename) 
+        : OpenglColorBuffer<B>(ctx) {
         create_texture(filename.c_str());
     }
 
