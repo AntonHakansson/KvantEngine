@@ -37,16 +37,17 @@ namespace Kvant {
     
     template <typename GRAPHICS, typename T>
     class Pipeline : public GRAPHICS::BasePipeline {
-        Pipeline(std::string resource_base_name) : GRAPHICS::BasePipeline(resource_base_name) { }
-        
-        PipelineProxy<GRAPHICS, T> by_proxy() {
-            return PipelineProxy<GRAPHICS, T>(static_cast<const T&>(*this));
-        }
+        public:
+            Pipeline(std::string resource_base_name) : GRAPHICS::BasePipeline(resource_base_name) { }
+            
+            PipelineProxy<GRAPHICS, T> by_proxy() {
+                return PipelineProxy<GRAPHICS, T>(static_cast<const T&>(*this));
+            }
 
-        const T& use(const GraphicsContext<GRAPHICS>& ctx) const {
-            GRAPHICS::BasePipeline::use(ctx);
-            return static_cast<const T&>(*this);
-        }
+            const T& use(const GraphicsContext<GRAPHICS>& ctx) const {
+                GRAPHICS::BasePipeline::use(ctx);
+                return static_cast<const T&>(*this);
+            }
     };
 
     template<typename GRAPHICS>
