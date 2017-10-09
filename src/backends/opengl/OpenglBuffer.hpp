@@ -25,6 +25,17 @@ namespace Kvant::graphics::opengl {
     template <typename B>
     int OpenglColorBuffer<B>::counter = 0;
 
+    template <typename B>
+    OpenglColorBuffer<B>::OpenglColorBuffer(const GraphicsContext<B>& ctx) {
+        this->unit = OpenglColorBuffer<B>::counter++;
+        GL_CHECK(glGenTextures(1, &this->tex));
+    }
+
+    template <typename B>
+    OpenglColorBuffer<B>::~OpenglColorBuffer() {
+        GL_CHECK(glDeleteTextures(1, &tex));
+    }
+
     template <typename GRAPHICS>
     struct OpenglRgbaBuffer : OpenglColorBuffer<GRAPHICS> {
         OpenglRgbaBuffer(const GraphicsContext<GRAPHICS>& ctx) : OpenglColorBuffer<GRAPHICS>(ctx) {}
@@ -39,12 +50,6 @@ namespace Kvant::graphics::opengl {
             this->height = h;
         }
     };
-
-    template <typename B>
-    OpenglColorBuffer<B>::OpenglColorBuffer(const GraphicsContext<B>& ctx) {
-        this->unit = OpenglColorBuffer<B>::counter++;
-        GL_CHECK(glGenTextures(1, &this->tex));
-    }
 
     template <typename GRAPHICS>
     class OpenglBaseBuffer {
