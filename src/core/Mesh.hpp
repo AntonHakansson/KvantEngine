@@ -178,19 +178,18 @@ namespace std {
             return u.i;
         }
 
-        int _hash(glm::vec2 v) {
+        static const int _hash(glm::vec2 v) {
             return abs(rawcast(v.x) ^ rawcast(v.y));
         }
 
-        int _hash(glm::vec3 v) {
+        static const int _hash(glm::vec3 v) {
             return abs(rawcast(v.x) ^ rawcast(v.y) ^ rawcast(v.y));
         }
     }
 
     template <>
     struct hash<Kvant::Vertex> {
-        std::size_t operator()(const Kvant::Vertex& v) const
-        {
+        std::size_t operator()(const Kvant::Vertex& v) const {
             using namespace _internal;
             std::size_t val = abs(_hash(v.position) ^ _hash(v.normal) ^ _hash(v.uvs));
             return val % 4096;
