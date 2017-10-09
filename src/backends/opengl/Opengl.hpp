@@ -96,7 +96,7 @@ namespace Kvant::graphics::opengl {
                 glDisableVertexAttribArray(1);
             }
 
-            glm::mat4* create_instance_buffer(glm::mat4** d, int c) {
+            void create_instance_buffer(glm::mat4** d, int c) {
                 *d = new glm::mat4[c];
                 _instance_bufs.push_back(*d);
             }
