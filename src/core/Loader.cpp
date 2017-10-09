@@ -1,16 +1,4 @@
-#include <stdlib.h>
-#include <unistd.h>
-#include <iostream>
-#include <fstream>
-#include <functional>
-#include <unordered_map>
-#include <vector>
-
-#include "backends/blueprints/Graphics.hpp"
-#include "core/Animation.hpp"
-#include "core/Mesh.hpp"
-#include "utils/lodepng.hpp"
-#include "utils/Logger.hpp"
+#include "core/Loader.hpp"
 
 namespace Kvant {
 
