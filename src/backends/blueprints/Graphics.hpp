@@ -52,7 +52,14 @@ namespace Kvant::blueprints::graphics {
     template <typename BACKEND>
     class Backend {
         public:
-            Backend() {}
+            Backend() {
+                static_assert(std::is_base_of<Pipeline<BACKEND>,
+                                typename BACKEND::Pipeline>::value);
+                static_assert(std::is_base_of<Pipeline<BACKEND>,
+                                typename BACKEND::BasePipeline>::value);
+                static_assert(std::is_base_of<Surface<BACKEND, typename BACKEND::Surface>,
+                                typename BACKEND::Surface>::value);
+            }
             virtual void clear_screen() const = 0;
             virtual void update_frame() = 0;
     };
