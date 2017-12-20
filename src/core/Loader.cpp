@@ -18,7 +18,7 @@ namespace Kvant {
     class nodes_reader : public token_reader {
         public:
             std::vector<int> parents;
-            skeleton _skeleton;
+            Skeleton _skeleton;
             void read(std::ifstream& f) override {
                 std::string ids, name;
                 int id, id2;
@@ -28,8 +28,49 @@ namespace Kvant {
                     f >> name >> id2;
 
                     parents.push_back(id2);
-                    _skeleton.bones.push_back(bone{name, id2});
+                    _skeleton.bones.push_back(Bone{name, id2});
                     f >> ids;
+                }
+            }
+    };
+
+    class skeleton_reader : public token_reader {
+        public:
+            std::vector<Frame> _frames;
+            nodes_reader* _nr;
+            skeleton_reader(nodes_reader* nr) : _nr(nr) {}
+
+            void read(std::ifstream& f) override {
+                std::string time_token, ids;
+                int time, id;
+                float x, y, z, xx, yy, zz;
+                f >> ids;
+                Frame fr;
+                while (ids != "end") {
+                    if (ids == "time") {
+                        f >> time;
+/*                      if (fr.bone_positions.size() > 0) {
+                            fr.bake_transforms();
+                            _frames.push_back(fr);
+                        }
+                        fr.bone_parents.clear();
+                        fr.bone_positions.clear();
+                        fr.bone_rotations.clear();
+                        fr.bone_transforms.clear();
+                        fr.bone_inv_transforms.clear(); */
+                        LOG_WARNING << "SKELETONS NOT IMPLEMENTED!!!!";
+                    } else {
+                        // if = std::stoi(ids);
+                        // fr.bone_parents.push_back(_nr->parents[id]);
+                        f >> x >> y >> z >> xx >> yy >> zz;
+                        // fr.bone_positions.push_back(glm::vec3(x, y, z));
+                        // fr.bone_rotations.push_back(glm::eulerAngleXYZ(xx, yy, zz););
+                    }
+                    f >> ids;
+                    // if (ids == "end") {
+                    //  fr.bake_transforms();
+                    //    _frames.push_back(fr);
+                    // }
                 }
             }
     };
@@ -92,9 +133,9 @@ namespace Kvant {
                             ts.push_back(vs[vx]);
                         }
                     }
-                f >> material;
+                    f >> material;
+                }
             }
-        }
     };
 
     std::unique_ptr<Kvant::Model> read_smd(const char* filename) {
@@ -103,12 +144,12 @@ namespace Kvant {
 
         std::unique_ptr<version_reader> vr = std::make_unique<version_reader>();
         std::unique_ptr<nodes_reader> nr = std::make_unique<nodes_reader>();
-        // std::unique_ptr<skeleton_reader> sr = std::make_unique<skeleton_reader>(nr.get());
+        std::unique_ptr<skeleton_reader> sr = std::make_unique<skeleton_reader>(nr.get());
         std::unique_ptr<triangles_reader> tr = std::make_unique<triangles_reader>();
 
         readers["version"] = vr.get();
         readers["nodes"] = nr.get();
-        // readers["skeleton"] = sr.get();
+        readers["skeleton"] = sr.get();
         readers["triangles"] = tr.get();
 
         std::ifstream f(filename, std::ios::in);
@@ -118,7 +159,7 @@ namespace Kvant {
 
         f >> token;
         while (f.eof() == false) {
-            if (readers.find(token) == readers.end()) throw std::runtime_error("Error reading SMD");
+            if (readers.find(token) == readers.end()) throw std::runtime_error("Error reading SMD, token " + token + " not found");
             readers[token]->read(f);
             f >> token;
         }

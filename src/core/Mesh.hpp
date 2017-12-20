@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "utils/Logger.hpp"
 
 namespace Kvant {
     using namespace glm;
@@ -19,13 +20,31 @@ namespace Kvant {
         vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
         vec2 uvs;
 
+        static void vec2_to_array(vec2 b, float* out) {
+            out[0] = b.x;
+            out[1] = b.y;
+        }
+        
+        static void vec3_to_array(vec3 b, float* out) {
+            out[0] = b.x;
+            out[1] = b.y;
+            out[2] = b.z;
+        }
+
+        static void vec4_to_array(vec4 b, float* out) {
+            out[0] = b.x;
+            out[1] = b.y;
+            out[2] = b.z;
+            out[3] = b.w;
+        }
+
         void to_array(float* p) {
-            p[0] = *glm::value_ptr(position);
-            p[3] = *glm::value_ptr(normal);
-            p[6] = *glm::value_ptr(tangent);
-            p[9] = *glm::value_ptr(binormal);
-            p[12] = *glm::value_ptr(uvs);
-            p[14] = *glm::value_ptr(color);
+            vec3_to_array(position, &p[0]);
+            vec3_to_array(normal, &p[3]);
+            vec3_to_array(tangent, &p[6]);
+            vec3_to_array(binormal, &p[9]);
+            vec2_to_array(uvs, &p[12]);
+            vec4_to_array(color, &p[14]);
         }
 
     };
@@ -162,7 +181,7 @@ namespace Kvant {
 
         void generate_tangents() {
             for (auto& m : meshes) m->generate_tangents();
-        }        
+        }
     };
 }
 

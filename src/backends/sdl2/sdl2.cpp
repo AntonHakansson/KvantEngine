@@ -46,7 +46,6 @@ namespace Kvant::platform::sdl {
         SDL_GetDesktopDisplayMode(0, &mode);
         _screen.w = (int)(mode.h - 200) / 1.5;
         _screen.h = mode.h - 200;
-        float zoom = 1.0f;
         _main_window = SDL_CreateWindow("Sample Window", SDL_WINDOWPOS_CENTERED,
                                         SDL_WINDOWPOS_CENTERED, _screen.w, _screen.h,
                                         ext_flags | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
@@ -87,21 +86,6 @@ namespace Kvant::platform::sdl {
 
     }
 
-    std::string PlatformIsSdl::read_file(std::string filename) {
-        std::string buf;
-        SDL_RWops* sdlIO = SDL_RWFromFile(filename.c_str(), "r");
-        if (sdlIO != NULL) {
-            char data;
-            std::size_t amountRead;
-            while ((amountRead = SDL_RWread(sdlIO, &data, 1, 1)) > 0) {
-                buf += data;
-            }
-
-            SDL_RWclose(sdlIO);
-        }
-        return buf;
-    }
-
     BackendForOpengl::BackendForOpengl() : PlatformIsSdl(SDL_WINDOW_OPENGL) {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
@@ -138,7 +122,7 @@ namespace Kvant::platform::sdl {
 
     void BackendForOpengl::imgui_frame() {
         glActiveTexture(GL_TEXTURE0);
-        //glUseProgram(0);
+        glUseProgram(0);
         ImGui_ImplSdl_NewFrame(_main_window);
     }
 

@@ -55,7 +55,7 @@ namespace Kvant::graphics::opengl {
             }
 
             void bind_sampler(Sampler id, const OpenglColorBuffer<GRAPHICS>* t) const {
-                GL_CHECK(glActivateTexture(GL_TEXTURE0 + t->unit));
+                GL_CHECK(glActiveTexture(GL_TEXTURE0 + t->unit));
                 GL_CHECK(glBindTexture(GL_TEXTURE_2D, t->tex));
                 GL_CHECK(glUniform1i(id, t->unit));
             }
@@ -90,11 +90,24 @@ namespace Kvant::graphics::opengl {
                 GL_CHECK(glEnableVertexAttribArray(id));
             }
 
+            void bind_instances_data(Attrib id) const {
+                for (unsigned int i = 0; i < 4; i++) {
+                    glEnableVertexAttribArray(id + i);
+                    glVertexAttribPointer(id + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4),
+                                          (const GLvoid*)(sizeof(GLfloat) * i * 4));
+                    glVertexAttribDivisor(id + i, 1);
+                }
+            }
 
+            void disable_attrib(Attrib id) const {
+                glDisableVertexAttribArray(id);
+            }
 
         protected:
             GLuint shader_program, shader_frag, shader_vert, last_program;
-
+            GraphicsContext<GRAPHICS> adhoc_context() const {
+                return GraphicsContext<GRAPHICS>{_graphics};
+            }
         private:
             mutable GRAPHICS* _graphics;
             void check_shader(GLuint shader) const;
@@ -107,7 +120,9 @@ namespace Kvant::graphics::opengl {
     OpenglPipeline<GRAPHICS, PLATFORM>::OpenglPipeline(std::string fragment, std::string vertex) {
         LOG_DEBUG << "Initializing Opengl Pipeline with fragment: " << fragment << ", vertex: " << vertex;
         load_shader(&this->shader_vert, PLATFORM::read_file(vertex), GL_VERTEX_SHADER);
+        LOG_DEBUG << "Successfully loaded vertex shader";
         load_shader(&this->shader_frag, PLATFORM::read_file(fragment), GL_FRAGMENT_SHADER);
+        LOG_DEBUG << "Successfully loaded fragment shader";
         this->shader_program = GL_CHECK(glCreateProgram());
         GL_CHECK(glAttachShader(this->shader_program, this->shader_vert));
         GL_CHECK(glAttachShader(this->shader_program, this->shader_frag));

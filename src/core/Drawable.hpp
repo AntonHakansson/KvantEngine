@@ -24,6 +24,10 @@ namespace Kvant {
             void draw_instances(const GraphicsContext<GRAPHICS>& ctx, const PIPELINE& s,
                                 const typename PIPELINE::Material& material,
                                 const glm::mat4* transforms, int count) const;
+            
+            template <typename PIPELINE>
+            void draw_instances(const GraphicsContext<GRAPHICS>& ctx, const PIPELINE& s,
+                                const glm::mat4* transforms, int count) const;
 
         private:
             std::vector<std::unique_ptr<Kvant::blueprints::graphics::Surface<GRAPHICS, typename GRAPHICS::Surface>>> _surfaces;
@@ -52,6 +56,14 @@ namespace Kvant {
         }
     }
 
+    template <typename GRAPHICS, typename ACTUAL>
+    template <typename PIPELINE>
+    void Drawable<GRAPHICS, ACTUAL>::draw_instances(const GraphicsContext<GRAPHICS>& ctx, const PIPELINE& s,
+                                                const glm::mat4* transforms, int count) const {
+        for (const auto& surf : _surfaces) {
+            surf.get()->draw_instanced(*ctx.graphics, s, transforms, count);
+        }
+    }
 }
 
 #endif // DRAWABLE_HPP_INCLUDED

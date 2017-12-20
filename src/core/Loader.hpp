@@ -9,6 +9,8 @@
 #include <unordered_map>
 #include <vector>
 #include <memory>
+#include <glm/glm.hpp>
+#include <glm/gtx/euler_angles.hpp>
 
 #include "backends/blueprints/Graphics.hpp"
 #include "core/Animation.hpp"

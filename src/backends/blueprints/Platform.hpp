@@ -2,9 +2,13 @@
 #define PLATFORM_HPP_INCLUDED
 
 #include <string>
+#include <cstring>
+#include <fstream>
 #include <functional>
+#include <errno.h>
 
 #include "core/Screen.hpp"
+#include "utils/Logger.hpp"
 
 namespace Kvant {
     enum key {
@@ -31,6 +35,19 @@ namespace Kvant {
                 Kvant::Screen& screen() { return _screen; }
                 std::function<void(int w, int h)> on_resize_callback;
                 std::function<void(int k)> on_key_callback;
+
+                static std::string read_file(std::string filename) {
+                    std::ifstream in;
+                    in.open(filename, std::ifstream::in);
+
+                    if(!in) {
+                        LOG_ERROR << "Error reading file: " << filename;
+                        LOG_ERROR << strerror(errno);
+                        return "";
+                    }
+
+                    return std::string(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>());
+                }
         };
     }
 

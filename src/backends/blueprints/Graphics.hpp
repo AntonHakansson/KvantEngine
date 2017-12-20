@@ -28,12 +28,12 @@ namespace Kvant::blueprints::graphics {
             max_x = min_x = max_y = min_y = max_z = min_z = 0;
             for (const auto& v : m->vertices) {
                 glm::vec3 p = v.position;
-                max_x = std::max(max_x, p[0]);
-                min_x = std::min(min_x, p[0]);
-                max_y = std::max(max_y, p[1]);
-                min_y = std::min(min_y, p[1]);
-                max_z = std::max(max_z, p[2]);
-                min_z = std::min(min_z, p[2]);
+                max_x = std::max(max_x, p.x);
+                min_x = std::min(min_x, p.x);
+                max_y = std::max(max_y, p.y);
+                min_y = std::min(min_y, p.y);
+                max_z = std::max(max_z, p.z);
+                min_z = std::min(min_z, p.z);
             }
             max_v = glm::vec3(max_x, max_y, max_z);
             min_v = glm::vec3(min_x, min_y, min_z);
@@ -63,7 +63,6 @@ namespace Kvant::blueprints::graphics {
             virtual void clear_screen() const = 0;
             virtual void update_frame() = 0;
     };
-
 }
 
 #endif // GRAPHICS_HPP_INCLUDED

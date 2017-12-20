@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 #include "utils/Checks.hpp"
+#include "utils/Logger.hpp"
 
 namespace Kvant::graphics::opengl {
     using namespace glm;
@@ -18,6 +19,7 @@ namespace Kvant::graphics::opengl {
         OpenglSurface(const GraphicsContext<typename GRAPHICS::Backend>& ctx, Mesh* m)
             : Kvant::blueprints::graphics::Surface<GRAPHICS, OpenglSurface<GRAPHICS>>(ctx, m){
             int vertex_size = m->is_rigged ? 24 : 18;
+            Kvant::Vertex test;
             this->calc_bounds(m);
             glGenBuffers(1, &vertex_vbo);
             glGenBuffers(1, &triangle_vbo);
@@ -27,22 +29,25 @@ namespace Kvant::graphics::opengl {
             this->n_vertices = m->vertices.size();
             this->n_triangles = m->triangles.size() / 3;
 
-            float* vb_data = (float*) malloc(sizeof(float) * this->n_vertices * vertex_size);
+            const int vb_size = sizeof(GLfloat) * this->n_vertices * vertex_size;
+            float* vb_data = (float*) malloc(vb_size);
             for (int i = 0; i < this->n_vertices; i++) {
                 m->vertices[i].to_array( &vb_data[i*vertex_size] );
+
                 if (m->is_rigged) {
                     std::runtime_error("Rigged not implemented");
                 }
-
-                glBindBuffer(GL_ARRAY_BUFFER, this->vertex_vbo);
-                glBufferData(GL_ARRAY_BUFFER, sizeof(float) * this->n_vertices * vertex_size, vb_data, GL_STATIC_DRAW);
-
-                free(vb_data);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->triangle_vbo);
-                glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * this->n_triangles * 3, &m->triangles[0], GL_STATIC_DRAW);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-                glBindBuffer(GL_ARRAY_BUFFER, 0);
             }
+            glBindBuffer(GL_ARRAY_BUFFER, this->vertex_vbo);
+            glBufferData(GL_ARRAY_BUFFER, vb_size, vb_data, GL_STATIC_DRAW);
+            free(vb_data);
+            
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->triangle_vbo);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * this->n_triangles * 3,
+                         &m->triangles[0], GL_STATIC_DRAW);
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
 
         virtual ~OpenglSurface() {
@@ -62,9 +67,9 @@ namespace Kvant::graphics::opengl {
             GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * count, transform, GL_DYNAMIC_DRAW));
 
             GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, this->vertex_vbo));
-            shader.enable_vertex_attrivs();
+            shader.enable_vertex_attributes();
 
-            GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->triangles_vbo));
+            GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->triangle_vbo));
             GL_CHECK(glDrawElementsInstanced(GL_TRIANGLES, this->n_triangles * 3, GL_UNSIGNED_INT, (void*)0, count));
 
             shader.disable_all_vertex_attribs();

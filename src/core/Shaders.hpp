@@ -22,7 +22,9 @@ namespace Kvant {
                  const typename GRAPHICS::Texture* d,
                  const typename GRAPHICS::Texture* n,
                  const typename GRAPHICS::Texture* s)
-            : diffuse(d), normal(n), specular(s) { }
+            : diffuse(d), normal(n), specular(s) {
+            LOG_DEBUG << "Constructed MAterial";    
+        }
         
         template<typename SHADER>
         void bind(const GraphicsContext<GRAPHICS>& ctx, const SHADER& s) const {
@@ -55,7 +57,7 @@ namespace Kvant {
         public:
             using Material = Kvant::Material<GRAPHICS>;
             ForwardPipeline(const GraphicsContext<GRAPHICS>& ctx)
-                    : Pipeline<GRAPHICS, ForwardPipeline<GRAPHICS>>("res/shader/forward") {
+                    : Pipeline<GRAPHICS, ForwardPipeline<GRAPHICS>>("res/shaders/forward") {
                 this->use(ctx);
                 _tex = this->add_sampler("tex_diffuse");
                 _ntex = this->add_sampler("tex_normal");
@@ -67,6 +69,15 @@ namespace Kvant {
                 _vtan = this->add_attrib("av3_tangent");
                 _vuvs = this->add_attrib("av2_texcoord");
                 _itfm = this->add_attrib("am4_transform");
+            }
+
+            template <typename SOMETHING>
+            const ForwardPipeline& draw(const SOMETHING& what) const {
+                what.get_drawable().draw_instances(this->adhoc_context(),
+                                                   *this,
+                                                   what.get_transformable().get_transforms(),
+                                                   what.get_transformable().size());
+                return *this;
             }
 
             template <typename CONTEXT, typename ENTITY>
@@ -92,10 +103,10 @@ namespace Kvant {
                 return *this;
             }
 
-            ForwardPipeline& set_material(const Material& solid_mat) const {
+            const ForwardPipeline& set_material(const Material& solid_mat) const {
                 this->bind_sampler(_tex, solid_mat.diffuse);
-                this->bind_sampler(_tex, solid_mat.normal);
-                this->bind_sampler(_tex, solid_mat.specular);
+                this->bind_sampler(_ntex, solid_mat.normal);
+                this->bind_sampler(_stex, solid_mat.specular);
                 return *this;
             }
 
@@ -119,7 +130,11 @@ namespace Kvant {
                                         2,                          // vec2
                                         18,                         // total floats per vertex
                                         (void*)(sizeof(float)*12));  // position in vertex
-           }
+            }
+
+            void bind_instances() const {
+                this->bind_instances_data(_itfm);
+            }
 
             const ForwardPipeline& set_modelview(glm::mat4 mvp) const {
                 this->bind_uniform(_mvp, mvp);
@@ -133,7 +148,6 @@ namespace Kvant {
 
             template <typename CAMERA>
             const ForwardPipeline& set_camera(const CAMERA& c) const {
-                // TODO: implement camera
                 set_eyepos(c.entity().pos);
                 set_modelview(c.entity().proj * c.get_transformable().get_transforms()[0]);
                 return *this;

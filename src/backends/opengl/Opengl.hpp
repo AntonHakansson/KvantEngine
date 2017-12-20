@@ -24,6 +24,7 @@ namespace Kvant::graphics::opengl {
             using CBackend = Backend<PLATFORM>;
             using Surface = OpenglSurface<CBackend>;
             using Texture = OpenglTexture<CBackend>;
+            using FrameBuffer = OpenglBaseBuffer<CBackend>;
 
             static const OpenglRenderPassClearCmd clear;
             static const OpenglScreenBuffer<Backend> screen_buffer;
@@ -77,7 +78,7 @@ namespace Kvant::graphics::opengl {
                 if (quadVAO == 0) {
                     GLfloat quad_vertices[] = {
                         -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-                        1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+                        1.0f,  1.0f, 0.0f, 1.0f, 1.0f, 1.0f,  -1.0f, 0.0f, 1.0f, 0.0f,
                     };
                     glGenVertexArrays(1, &quadVAO);
                     glGenBuffers(1, &quadVBO);
@@ -85,9 +86,9 @@ namespace Kvant::graphics::opengl {
                     glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
                     glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertices), &quad_vertices, GL_STATIC_DRAW);
                     glEnableVertexAttribArray(0);
-                    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (GLvoid*)0);
+                    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
                     glEnableVertexAttribArray(1);
-                    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (GLvoid*)(3 * sizeof(GLfloat)));
+                    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
                 }
                 glBindVertexArray(quadVAO);
                 glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -102,7 +103,6 @@ namespace Kvant::graphics::opengl {
             }
 
             void update_instance_buffer(glm::mat4* data, int c) {
-                
             }
 
             bool created = false;

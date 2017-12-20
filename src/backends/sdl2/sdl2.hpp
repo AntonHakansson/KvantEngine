@@ -6,6 +6,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengles.h>
+#include <GLES3/gl31.h>
 
 #include "backends/blueprints/Platform.hpp"
 
@@ -53,7 +54,6 @@ namespace Kvant::platform::sdl {
             void get_mouse(int *x, int *y) const override;
 
             virtual void on_window_resize(SDL_Event const* event) = 0;
-            static std::string read_file(std::string filename);
 
         protected:
             SDL_Window* _main_window;

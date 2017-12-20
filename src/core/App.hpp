@@ -11,6 +11,7 @@
 
 #include "utils/Logger.hpp"
 #include "core/Scene.hpp"
+#include "core/Renderer.hpp"
 #include "core/Shaders.hpp"
 #include "core/Traits.hpp"
 #include "core/Drawable.hpp"
@@ -40,6 +41,8 @@ namespace Kvant {
             using Texture = typename GRAPHICS<Platform>::Texture;
 
             using ForwardPipeline = Kvant::ForwardPipeline<Graphics>;
+
+            using RenderPass = Kvant::RenderPass<Graphics>;
 
             using Material = Kvant::Material<Graphics>;
 
@@ -72,11 +75,11 @@ namespace Kvant {
             template <typename FIRST_SCENE>
             int run() {
                 LOG_DEBUG << "Entering Main Game Loop.";
+                _ctx.elapsed = 0;
 
                 _active_scene = std::make_unique<FIRST_SCENE>(_ctx, &_platform._screen);
                 std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
                 start = std::chrono::high_resolution_clock::now();
-                _ctx.elapsed = 0;
                 while(_platform.process_events() && !_quit) {
                     _ctx.measure("core updates").begin();
                     _graphics.update_frame();
@@ -87,8 +90,7 @@ namespace Kvant {
                     this->update(_ctx);
                     end = std::chrono::high_resolution_clock::now();
                     auto ms = std::chrono::duration_cast<std::chrono::microseconds>(end-start);
-                    float dt = ms.count() / 1000000.0f;
-                    _ctx.elapsed = dt;
+                    _ctx.elapsed = ms.count() / 1000000.0f;
                     start = std::chrono::high_resolution_clock::now();
                 }
 
@@ -100,8 +102,10 @@ namespace Kvant {
             virtual void update(const Context& _ctx) {
                 clear_frame();
                 _active_scene.get()->update(_ctx);
+
                 _ctx.measure("core imgui").begin();
                 _ctx.p->imgui_frame();
+                _ctx.imgui();
                 _active_scene.get()->imgui(_ctx);
                 ImGui::Render();
                 _ctx.measure("core imgui").end();
