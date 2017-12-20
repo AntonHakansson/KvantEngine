@@ -76,7 +76,12 @@ namespace Kvant {
                 retransform();
             }
             virtual void pan(float a1) override {
-
+                auto cam_dir = glm::normalize(*_driven_tgt - *_driven_pos);
+                auto side_dir = glm::cross(cam_dir, _up);
+                cam_dir += (side_dir * -a1);
+                cam_dir = glm::normalize(cam_dir);
+                *_driven_tgt = *_driven_pos + cam_dir;
+                retransform();
             }
             virtual void jump() override {
 
