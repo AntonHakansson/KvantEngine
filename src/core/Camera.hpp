@@ -38,8 +38,8 @@ namespace Kvant {
                     ImGui::SameLine();
                     ImGui::SliderFloat("far", &_far, 0.0f, 3000.0f);
                     ImGui::PopItemWidth();
-                    ImGui::InputFloat3("pos", glm::value_ptr(pos));
-                    ImGui::InputFloat3("tgt", glm::value_ptr(tgt));
+                    ImGui::SliderFloat3("pos", glm::value_ptr(pos), -100.0f, 100.0f);
+                    ImGui::SliderFloat3("tgt", glm::value_ptr(tgt), -100.0f, 100.0f);
                     updateProjection();
                 }
             }

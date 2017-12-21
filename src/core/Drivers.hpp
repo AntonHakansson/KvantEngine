@@ -85,13 +85,16 @@ namespace Kvant {
     class DirectDriver {
         public:
             using initializer = glm::mat4;
-            DirectDriver(const CoreContext& ctx, glm::mat4* transform, DRIVABLE* d, glm::mat4 im);
+            DirectDriver(const CoreContext& ctx, glm::mat4* transform, DRIVABLE* d, glm::mat4 im)
+                            : _driven_transform(transform) {
+                reset();
+            }
 
             void update();
             void reset();
             void rotate(glm::vec3 v);
             void rotate(glm::quat v);
-            void looat_at(glm::vec3 pos, glm::vec3 tgt, glm::vec3 up = glm::vec3(0.0, 1.0, 0.0));
+            void look_at(glm::vec3 pos, glm::vec3 tgt, glm::vec3 up = glm::vec3(0.0, 1.0, 0.0));
             void scale(glm::vec3 v);
             void translate(glm::vec3 v);
 
@@ -152,14 +155,15 @@ namespace Kvant {
                 int mouse_x, mouse_y;
                 ctx.get_platform()->get_mouse(&mouse_x, &mouse_y);
                 if (_mouse_active) {
-                    float a1 = -(float)mouse_x * 0.001;
-                    float a2 = (float)mouse_y * 0.001;
+                    float a1 = -(float)mouse_x * _mouse_sensitivity / 1000;
+                    float a2 = (float)mouse_y * _mouse_sensitivity / 1000;
                     pi->follow(a1, a2);
                 }
             }
 
         private:
             bool _mouse_active{false};
+            float _mouse_sensitivity{2.0};
     };
 }
 

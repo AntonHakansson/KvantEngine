@@ -31,7 +31,7 @@ class SpaceScene : public my_app::Scene {
     public:
         SpaceScene(const my_app::Context& ctx, Kvant::Screen* screen) 
             : _moon(ctx, Kvant::pos::origin),
-              _camera{ctx, Kvant::PovDriver::look_at({0.0, 0.0, -1.0}, {0.0, 0.0, 0.0}), screen},
+              _camera{ctx, Kvant::PovDriver::look_at({0.0, 0.0, -50.0}, {0.0, 0.0, 0.0}), screen},
               _pipeline(ctx) {
         }
 
@@ -39,14 +39,10 @@ class SpaceScene : public my_app::Scene {
             if (ctx.get_platform()->is_key_pressed(Kvant::key::Q)) {
                 ctx.quit();
             }
-            /*if (ctx.get_platform()->is_key_pressed(Kvant::key::A)) {
-                auto moon_trans = _moon.get_transforms_ptr();
-                *moon_trans = glm::translate(*moon_trans, glm::vec3(0.01, 0, 0));
+
+            if (ctx.get_platform()->is_key_pressed(Kvant::key::P)) {
+                _moon.get_driver_ptr()->translate(glm::vec3(0.1, 0.0, 0.0));
             }
-            if (ctx.get_platform()->is_key_pressed(Kvant::key::D)) {
-                auto moon_trans = _moon.get_transforms_ptr();
-                *moon_trans = glm::translate(*moon_trans, glm::vec3(-0.01, 0, 0));
-            }*/
 
             _wasd.update(ctx, _camera.get_driver_ptr());
 
@@ -56,7 +52,7 @@ class SpaceScene : public my_app::Scene {
         void render(const my_app::Context& ctx) override {
             my_app::RenderPass(ctx)
                 .target(my_app::Graphics::screen_buffer)
-                .clear({0, 0, 0, 1});
+                .clear();
             
             _pipeline.use(ctx)
                 .set_material(_moon.get_drawable().get_material())
@@ -68,7 +64,8 @@ class SpaceScene : public my_app::Scene {
             _camera.entity_ptr()->imgui();
         }
 
-        private : Kvant::Instance<Moon> _moon;
+    private:
+        Kvant::Driven<Kvant::Instance<Moon>, Kvant::DirectDriver> _moon;
         Kvant::Driven<Kvant::Instance<Kvant::Camera>, Kvant::HoverDriver> _camera;
         Kvant::wsad_controller  _wasd;
         my_app::ForwardPipeline _pipeline;
