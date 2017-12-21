@@ -38,7 +38,7 @@ namespace Kvant {
             virtual void pan(float a1) = 0;
             virtual void jump() = 0;
             virtual void stop() = 0;
-            virtual void pedestal(float d) = 0;
+            virtual void strafe(float d) = 0;
     };
     
     template <typename DRIVABLE>
@@ -89,8 +89,13 @@ namespace Kvant {
             virtual void stop() override {
 
             }
-            virtual void pedestal(float d) override {
-
+            virtual void strafe(float d) override {
+                auto cam_dir = glm::normalize(*_driven_tgt - *_driven_pos);
+                auto side_dir = glm::cross(cam_dir, _up);
+                auto delta = side_dir * d;
+                *_driven_pos += delta;
+                *_driven_tgt += delta;
+                retransform();
             }
 
             virtual void update() {
