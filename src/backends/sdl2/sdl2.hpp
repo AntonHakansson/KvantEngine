@@ -49,7 +49,9 @@ namespace Kvant::platform::sdl {
             void release_mouse() const override;
             void update_mouse() override;
             bool process_events() override;
+            bool is_key_down(key k) const override;
             bool is_key_pressed(key k) const override;
+            bool is_key_up(key k) const override;
             bool is_button_pressed() const override;
             void get_mouse(int *x, int *y) const override;
 
@@ -58,7 +60,8 @@ namespace Kvant::platform::sdl {
         protected:
             SDL_Window* _main_window;
             SDL_GLContext _gl_context;
-            const Uint8* _kbstate;
+            Uint8 _kbstate[SDL_NUM_SCANCODES];
+            Uint8 _prev_kbstate[SDL_NUM_SCANCODES];
             int mouse_x, mouse_y;
             Uint8 mstate;
     };

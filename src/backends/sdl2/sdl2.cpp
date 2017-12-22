@@ -6,12 +6,25 @@
 
 namespace Kvant::platform::sdl {
 
-    bool PlatformIsSdl::is_key_pressed(key k) const {
+    bool PlatformIsSdl::is_key_down(key k) const {
         return _kbstate[YAGL_TO_SDL_KEY[k]];
     }
 
+    bool PlatformIsSdl::is_key_pressed(key k) const {
+        auto yagl = YAGL_TO_SDL_KEY[k];
+        return (_kbstate[yagl]) && (!_prev_kbstate[yagl]);
+    }
+
+    bool PlatformIsSdl::is_key_up(key k) const {
+        auto yagl = YAGL_TO_SDL_KEY[k];
+        return (!_kbstate[yagl]) && (_prev_kbstate[yagl]);
+    }
+
     void PlatformIsSdl::update_keyboard() {
-        _kbstate = SDL_GetKeyboardState(NULL);
+        if (_kbstate) {
+            memcpy(_prev_kbstate, _kbstate, sizeof(_kbstate[0])*SDL_NUM_SCANCODES);
+        }
+        memcpy(_kbstate, SDL_GetKeyboardState(nullptr), sizeof(_kbstate[0])*SDL_NUM_SCANCODES);
     }
 
     void PlatformIsSdl::update_mouse() {
@@ -49,6 +62,7 @@ namespace Kvant::platform::sdl {
         _main_window = SDL_CreateWindow("Sample Window", SDL_WINDOWPOS_CENTERED,
                                         SDL_WINDOWPOS_CENTERED, _screen.w, _screen.h,
                                         ext_flags | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+        memset(_prev_kbstate, 0, sizeof(_prev_kbstate[0])*SDL_NUM_SCANCODES);
         if (!_main_window) {
             std::runtime_error("Unable to create window");
         }
@@ -68,14 +82,20 @@ namespace Kvant::platform::sdl {
                 case SDL_QUIT:
                     done = true;
                     break;
+                
                 case SDL_WINDOWEVENT: 
                     switch (event.window.event) {
                         case SDL_WINDOWEVENT_RESIZED:
                             on_window_resize(&event);
                             break;
                     }
+                    break;
+            
                 case SDL_KEYDOWN:
                     on_key_callback(event.key.keysym.sym);
+                    break;
+
+                default:
                     break;
             }
         }

@@ -29,7 +29,9 @@ namespace Kvant {
                 virtual void release_mouse() const = 0;
                 virtual void update_mouse() = 0;
                 virtual bool process_events() = 0;
+                virtual bool is_key_down(key k) const = 0;
                 virtual bool is_key_pressed(key k) const = 0;
+                virtual bool is_key_up(key k) const = 0;
                 virtual bool is_button_pressed() const = 0;
                 virtual void get_mouse(int *x, int *y) const = 0;
                 Kvant::Screen& screen() { return _screen; }
