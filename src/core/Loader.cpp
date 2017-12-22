@@ -1,6 +1,85 @@
 #include "core/Loader.hpp"
+#define TINYOBJLOADER_IMPLEMENTATION // define this in only *one* .cc
+#include "utils/tiny_obj_loader.hpp"
 
 namespace Kvant {
+
+    std::unique_ptr<Kvant::Model> read_obj(const char* filename) {
+        tinyobj::attrib_t attrib;
+        std::vector<tinyobj::shape_t> shapes;
+
+        std::string err;
+        bool ret = tinyobj::LoadObj(&attrib, &shapes, NULL, &err, filename);
+
+        if (!err.empty()) {
+            if (ret) LOG_WARNING << err;
+            else     throw std::runtime_error(err);
+        }
+
+        auto model = std::make_unique<Kvant::Model>();
+        auto mesh = std::make_unique<Kvant::Mesh>();
+        std::unordered_map<Kvant::Vertex, int> vs;
+        int vi = 0;
+        
+        // Loop over shapes
+        for (size_t s = 0; s < shapes.size(); s++) {
+            // Loop over faces(polygon)
+            size_t index_offset = 0;
+            for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
+                int fv = shapes[s].mesh.num_face_vertices[f];
+                // Loop over vertices in the face.
+                for (size_t v = 0; v < fv; v++) {
+                    // access to vertex
+                    tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
+
+                    tinyobj::real_t vx = attrib.vertices[3 * idx.vertex_index + 0];
+                    tinyobj::real_t vy = attrib.vertices[3 * idx.vertex_index + 1];
+                    tinyobj::real_t vz = attrib.vertices[3 * idx.vertex_index + 2];
+                    tinyobj::real_t nx = attrib.normals[3 * idx.normal_index + 0];
+                    tinyobj::real_t ny = attrib.normals[3 * idx.normal_index + 1];
+                    tinyobj::real_t nz = attrib.normals[3 * idx.normal_index + 2];
+                    tinyobj::real_t tx = attrib.texcoords[2 * idx.texcoord_index + 0];
+                    tinyobj::real_t ty = attrib.texcoords[2 * idx.texcoord_index + 1];
+
+                    // TODO: implement vertex color
+                    /*tinyobj::real_t red = attrib.colors[3*idx.vertex_index+0];
+                    tinyobj::real_t green = attrib.colors[3*idx.vertex_index+1];
+                    tinyobj::real_t blue = attrib.colors[3*idx.vertex_index+2];
+                    tinyobj::real_t alpha = attrib.colors[3*idx.vertex_index+3];*/
+
+                    Vertex vert;
+                    vert.position = {vx, vy, vz};
+                    vert.normal = {nx, ny, nz};
+                    vert.uvs = {tx, ty};
+
+                    // Try find this vertex
+                    if (vs.find(vert) == vs.end()) {
+                        // if it hasn't been added, add it
+                        vs[vert] = vi;
+                        mesh->vertices.push_back(vert);
+                        mesh->triangles.push_back(vi);
+                        vi++;
+                    }
+                    else {
+                        // If it's already been seen, get it's indice
+                        mesh->triangles.push_back(vs[vert]);
+                    }
+
+                    // vert.color = {red, green, blue, alpha};
+                }
+                index_offset += fv;
+
+                // per-face material
+                shapes[s].mesh.material_ids[f];
+            }
+        }
+
+        LOG_DEBUG << "teached me";
+        model->meshes.push_back(std::move(mesh));
+        model->generate_tangents();
+        return std::move(model);
+    }
+
 
     class token_reader {
         public:
@@ -49,7 +128,7 @@ namespace Kvant {
                 while (ids != "end") {
                     if (ids == "time") {
                         f >> time;
-/*                      if (fr.bone_positions.size() > 0) {
+                        if (fr.bone_positions.size() > 0) {
                             fr.bake_transforms();
                             _frames.push_back(fr);
                         }
@@ -57,20 +136,19 @@ namespace Kvant {
                         fr.bone_positions.clear();
                         fr.bone_rotations.clear();
                         fr.bone_transforms.clear();
-                        fr.bone_inv_transforms.clear(); */
-                        LOG_WARNING << "SKELETONS NOT IMPLEMENTED!!!!";
+                        fr.bone_inv_transforms.clear();
                     } else {
-                        // if = std::stoi(ids);
-                        // fr.bone_parents.push_back(_nr->parents[id]);
+                        id = std::stoi(ids);
+                        fr.bone_parents.push_back(_nr->parents[id]);
                         f >> x >> y >> z >> xx >> yy >> zz;
-                        // fr.bone_positions.push_back(glm::vec3(x, y, z));
-                        // fr.bone_rotations.push_back(glm::eulerAngleXYZ(xx, yy, zz););
+                        fr.bone_positions.push_back(glm::vec3(x, y, z));
+                        fr.bone_rotations.push_back(glm::eulerAngleXYZ(xx, yy, zz));
                     }
                     f >> ids;
-                    // if (ids == "end") {
-                    //  fr.bake_transforms();
-                    //    _frames.push_back(fr);
-                    // }
+                    if (ids == "end") {
+                    fr.bake_transforms();
+                       _frames.push_back(fr);
+                    }
                 }
             }
     };
@@ -142,10 +220,10 @@ namespace Kvant {
         LOG_DEBUG << "Reading Model from: " << filename;
         std::map<std::string, token_reader*> readers;
 
-        std::unique_ptr<version_reader> vr = std::make_unique<version_reader>();
-        std::unique_ptr<nodes_reader> nr = std::make_unique<nodes_reader>();
-        std::unique_ptr<skeleton_reader> sr = std::make_unique<skeleton_reader>(nr.get());
-        std::unique_ptr<triangles_reader> tr = std::make_unique<triangles_reader>();
+        auto vr = std::make_unique<version_reader>();
+        auto nr = std::make_unique<nodes_reader>();
+        auto sr = std::make_unique<skeleton_reader>(nr.get());
+        auto tr = std::make_unique<triangles_reader>();
 
         readers["version"] = vr.get();
         readers["nodes"] = nr.get();
@@ -178,6 +256,33 @@ namespace Kvant {
         Model->meshes.push_back(std::move(Mesh));
         Model->generate_tangents();
         return std::move(Model);
+    }
+
+    std::vector<Frame> read_animation(const char* filename) {
+        LOG_DEBUG << "Reading animation file: " << filename;
+        std::map<std::string, token_reader*> readers;
+
+        auto vr = std::make_unique<version_reader>();
+        auto nr = std::make_unique<nodes_reader>();
+        auto sr = std::make_unique<skeleton_reader>(nr.get());
+
+        readers["version"] = vr.get();
+        readers["nodes"] = nr.get();
+        readers["skeleton"] = sr.get();
+
+        std::ifstream f(filename, std::ios::in);
+        if (!f) throw std::runtime_error("File not found");
+
+        std::string token;
+
+        f >> token;
+        while (f.eof() == false) {
+            if (readers.find(token) == readers.end()) throw std::runtime_error("Error reading SMD, token " + token + " not found");
+            readers[token]->read(f);
+            f >> token;
+        }
+
+        return sr->_frames;
     }
 
     bool load_png_for_texture(unsigned char** img, unsigned int* width,

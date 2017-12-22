@@ -20,7 +20,9 @@
 
 namespace Kvant {
 
+    std::unique_ptr<Kvant::Model> read_obj(const char* filename);
     std::unique_ptr<Kvant::Model> read_smd(const char* filename);
+    std::vector<Frame> read_animation(const char *filename);
     bool load_png_for_texture(unsigned char** img, unsigned int* width,
                               unsigned int* height, const char* filename);
 }
