@@ -120,27 +120,27 @@ namespace Kvant {
             template <typename DRIVER, typename P>
             void update(const Kvant::PlatformContext<P> &ctx, DRIVER *pi, bool stop_on_nothing = true) {
                 bool press = false;
-                if (ctx.get_platform()->is_key_pressed(Kvant::key::SPACE)) {
+                if (ctx.get_platform()->is_key_down(Kvant::key::SPACE)) {
                     pi->jump();
                     press = true;
                 }
-                if (ctx.get_platform()->is_key_pressed(Kvant::key::W)) {
+                if (ctx.get_platform()->is_key_down(Kvant::key::W)) {
                     pi->dolly(1);
                     press = true;
                 }
-                if (ctx.get_platform()->is_key_pressed(Kvant::key::S)) {
+                if (ctx.get_platform()->is_key_down(Kvant::key::S)) {
                     pi->dolly(-1);
                     press = true;
                 }
-                if (ctx.get_platform()->is_key_pressed(Kvant::key::D)) {
+                if (ctx.get_platform()->is_key_down(Kvant::key::D)) {
                     pi->truck(1);
                     press = true;
                 }
-                if (ctx.get_platform()->is_key_pressed(Kvant::key::A)) {
+                if (ctx.get_platform()->is_key_down(Kvant::key::A)) {
                     pi->truck(-1);
                     press = true;
                 }
-                if (ctx.get_platform()->is_key_pressed(Kvant::key::ESC)) {
+                if (ctx.get_platform()->is_key_down(Kvant::key::ESC)) {
                     _mouse_active = false;
                     ctx.get_platform()->release_mouse();
                 }
