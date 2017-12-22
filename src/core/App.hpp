@@ -57,13 +57,14 @@ namespace Kvant {
                 
                 _platform.on_resize_callback = [this](int w, int h) {
                     _platform._screen.notify_Subscribers();
-                    _active_scene->on_screen_resize(this->_ctx);
+                    _scene_manager.get_scene()->on_screen_resize(this->_ctx);
                 };
-                _platform.on_key_callback = [this](int k) { this->on_key(k); };
+                _platform.on_key_callback = [this](int k) { LOG_DEBUG << "WHATAFACK"; this->on_key(k); };
                 
                 _ctx.quit = [this]() { this->quit(); };
                 _ctx.p = &_platform;
                 _ctx.graphics = &_graphics;
+                _ctx.scenes = &_scene_manager;
 
                 set_imgui_style();
             }
@@ -77,7 +78,7 @@ namespace Kvant {
                 LOG_DEBUG << "Entering Main Game Loop.";
                 _ctx.elapsed = 0;
 
-                _active_scene = std::make_unique<FIRST_SCENE>(_ctx, &_platform._screen);
+                _scene_manager.template push_scene<FIRST_SCENE>(_ctx);
                 std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
                 start = std::chrono::high_resolution_clock::now();
                 while(_platform.process_events() && !_quit) {
@@ -92,6 +93,8 @@ namespace Kvant {
                     auto ms = std::chrono::duration_cast<std::chrono::microseconds>(end-start);
                     _ctx.elapsed = ms.count() / 1000000.0f;
                     start = std::chrono::high_resolution_clock::now();
+
+                    _scene_manager.get_scene()->update_scenes(_ctx);
                 }
 
                 LOG_DEBUG << "Main Loop Reached End";
@@ -101,17 +104,18 @@ namespace Kvant {
         private:
             virtual void update(const Context& _ctx) {
                 clear_frame();
-                _active_scene.get()->update(_ctx);
+                _scene_manager.get_scene()->update(_ctx);
 
                 _ctx.measure("core imgui").begin();
                 _ctx.p->imgui_frame();
                 _ctx.imgui();
-                _active_scene.get()->imgui(_ctx);
+                _scene_manager.get_scene()->imgui(_ctx);
                 ImGui::Render();
                 _ctx.measure("core imgui").end();
             }
 
-            virtual void on_key(int k) { }
+            virtual void on_key(int k) {
+            }
 
             void quit() {
                 _quit = true;
@@ -124,7 +128,7 @@ namespace Kvant {
             Platform _platform;
             Graphics _graphics;
             Context _ctx;
-            std::unique_ptr<Scene> _active_scene;
+            SceneManager<Context> _scene_manager;
             bool _quit = false;
     };
 

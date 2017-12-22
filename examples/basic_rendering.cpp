@@ -6,7 +6,59 @@
 using my_app = Kvant::App<Kvant::platform::sdl::BackendForOpengl,
                                   Kvant::graphics::opengl::Backend,
                                   Kvant::Context>;
+class SpaceScene;
+class IntroScene : public my_app::Scene {
+    public:
+        IntroScene(const my_app::Context &ctx)
+          : _camera(ctx, Kvant::pos::look_at({10, 0, -20}, {0, 0, 0}), &ctx.p->screen()),
+            _pipeline(ctx) {
+                _quit = [ctx]() { ctx.quit(); };
+            }
 
+        void update(const my_app::Context& ctx) override {
+            if (ctx.get_platform()->is_key_pressed(Kvant::key::Q)) {
+                ctx.quit();
+            }
+
+            render(ctx);
+        }
+
+        void render(const my_app::Context& ctx) override {
+            my_app::RenderPass(ctx)
+                .target(my_app::Graphics::screen_buffer)
+                .clear();
+            
+            _pipeline.use(ctx)
+                .set_eyepos(_camera.entity().pos)
+                .set_camera(_camera);
+        }
+            
+        void update_scenes(const my_app::Context& ctx) override {
+            if (_change_to_space)
+                ctx.scenes->push_scene<SpaceScene>(ctx);
+        }
+        
+        void resume(const my_app::Context& ctx) override { LOG_DEBUG << "MENu: Im Resumed!!"; }
+        void pause(const my_app::Context& ctx) override { LOG_DEBUG << "MENU: Im Paused!!"; }
+
+        void imgui(const my_app::Context &ctx) override {
+            _camera.entity_ptr()->imgui();
+            _change_to_space = false;
+            if (ImGui::CollapsingHeader("Scenes")) {
+                if (ImGui::Button("NEXT SCENE")) {
+                    _change_to_space = true;
+                }
+            }
+
+        }
+
+    private:
+        Kvant::Instance<Kvant::Camera> _camera;
+        my_app::ForwardPipeline _pipeline;
+        std::function<void()> _quit;
+        bool _change_to_space{false};
+};
+    
 class Moon : public my_app::Asset<Moon>,
              public my_app::Drawable<Moon> {
 
@@ -29,21 +81,13 @@ class Moon : public my_app::Asset<Moon>,
 
 class SpaceScene : public my_app::Scene {
     public:
-        SpaceScene(const my_app::Context& ctx, Kvant::Screen* screen) 
+        SpaceScene(const my_app::Context& ctx) 
             : _moon(ctx, Kvant::pos::origin),
-              _camera{ctx, Kvant::PovDriver::look_at({0.0, 0.0, -50.0}, {0.0, 0.0, 0.0}), screen},
+              _camera{ctx, Kvant::PovDriver::look_at({0.0, 0.0, -50.0}, {0.0, 0.0, 0.0}), &ctx.p->screen()},
               _pipeline(ctx) {
         }
 
         void update(const my_app::Context& ctx) override {
-            if (ctx.get_platform()->is_key_pressed(Kvant::key::Q)) {
-                ctx.quit();
-            }
-
-            if (ctx.get_platform()->is_key_pressed(Kvant::key::P)) {
-                _moon.get_driver_ptr()->translate(glm::vec3(0.1, 0.0, 0.0));
-            }
-
             _wasd.update(ctx, _camera.get_driver_ptr());
 
             render(ctx);
@@ -56,8 +100,22 @@ class SpaceScene : public my_app::Scene {
             
             _pipeline.use(ctx)
                 .set_material(_moon.get_drawable().get_material())
+                .set_eyepos(_camera.entity().pos)
                 .set_camera(*_camera.drivable_ptr())
                 .draw(_moon);
+        }
+            
+        void update_scenes(const my_app::Context& ctx) override {
+            if (ctx.get_platform()->is_key_pressed(Kvant::key::Q)) {
+                ctx.scenes->pop_scene(ctx);
+            }
+        }
+
+        void resume(const my_app::Context& ctx) override {
+            LOG_DEBUG << "SPACE: Im paused!!";
+        }
+        void pause(const my_app::Context& ctx) override {
+            LOG_DEBUG << "SPACE: Im paused!!";
         }
 
         void imgui(const my_app::Context &ctx) override {
@@ -73,7 +131,7 @@ class SpaceScene : public my_app::Scene {
 
 int main() {
     try {
-        my_app().run<SpaceScene>();
+        my_app().run<IntroScene>();
     } catch (const std::exception & e) {
         LOG_ERROR << e.what();
         return 1;

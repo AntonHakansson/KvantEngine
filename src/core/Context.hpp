@@ -5,6 +5,8 @@
 #include <map>
 #include "imgui/imgui.h"
 
+#include "core/Scene.hpp"
+
 namespace Kvant {
     struct CoreContext {
         float elapsed;
@@ -68,7 +70,7 @@ namespace Kvant {
     struct Context :    PlatformContext<PLATFORM>,
                         GraphicsContext<GRAPHICS>,
                         CoreContext {
-
+        SceneManager<Context<PLATFORM, GRAPHICS>>* scenes;
     };
 }
 
