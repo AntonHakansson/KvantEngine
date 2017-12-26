@@ -58,9 +58,9 @@ class IntroScene : public my_app::Scene {
         std::function<void()> _quit;
         bool _change_to_space{false}, _change_to_crate{false};
 };
-    
-Kvant::RawModelData _model_data(Kvant::read_model("res/examples/moon.fbx"));
-std::string resDir = "res/examples/";
+
+Kvant::RawModelData _model_data(Kvant::read_model((Kvant::res_path+"examples/moon.blend").c_str()));
+std::string resDir = Kvant::res_path + "examples/";
 class Moon : public my_app::Asset<Moon>,
              public my_app::Drawable<Moon> {
 
@@ -143,10 +143,10 @@ class Crate : public my_app::Asset<Crate>,
 
   public:
     Crate(const my_app::Context &ctx)
-        : my_app::Drawable<Crate>{ctx, "res/examples/crate2.smd"},
-          _diffuse_map{ctx, "res/examples/crate2_d.png"},
-          _normal_map{ctx, "res/examples/crate2_n.png"},
-          _specular_map{ctx, "res/examples/crate2_s.png"},
+        : my_app::Drawable<Crate>{ctx, Kvant::res_path + "examples/crate2.smd"},
+          _diffuse_map{ctx, Kvant::res_path + "examples/crate2_d.png"},
+          _normal_map{ctx, Kvant::res_path + "examples/crate2_n.png"},
+          _specular_map{ctx, Kvant::res_path + "rexamples/crate2_s.png"},
           _material{ctx, &_diffuse_map, &_normal_map, &_specular_map}
     {
     }

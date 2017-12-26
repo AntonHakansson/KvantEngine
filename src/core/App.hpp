@@ -1,6 +1,7 @@
 #ifndef APP_HPP_INCLUDED
 #define APP_HPP_INCLUDED
 
+
 #include <chrono>
 #include <iostream>
 #include <memory>
@@ -17,8 +18,10 @@
 #include "core/Traits.hpp"
 #include "imgui/imgui_kvant.cpp"
 #include "utils/Logger.hpp"
+#include "core/Constants.hpp"
 
 namespace Kvant {
+
 template <typename PLATFORM, template <typename> typename GRAPHICS,
           template <typename, typename> typename CONTEXT>
 class App {
@@ -128,7 +131,6 @@ private:
   SceneManager<Context> _scene_manager;
   bool _quit = false;
 };
-
 } // namespace Kvant
 
 #endif // APP_HPP_INCLUDED

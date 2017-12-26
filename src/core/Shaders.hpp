@@ -1,6 +1,8 @@
 #ifndef SHADERS_HPP_INCLUDED
 #define SHADERS_HPP_INCLUDED
 
+#include "core/Constants.hpp"
+
 namespace Kvant {
 
 template <typename GRAPHICS, typename S> class PipelineProxy {
@@ -21,7 +23,6 @@ template <typename GRAPHICS> struct Material {
            const typename GRAPHICS::Texture *n,
            const typename GRAPHICS::Texture *s)
       : diffuse(d), normal(n), specular(s) {
-    LOG_DEBUG << "Constructed MAterial";
   }
 
   template <typename SHADER>
@@ -55,7 +56,7 @@ class ForwardPipeline : public Pipeline<GRAPHICS, ForwardPipeline<GRAPHICS>> {
 public:
   using Material = Kvant::Material<GRAPHICS>;
   ForwardPipeline(const GraphicsContext<GRAPHICS> &ctx)
-      : Pipeline<GRAPHICS, ForwardPipeline<GRAPHICS>>("res/shaders/forward") {
+      : Pipeline<GRAPHICS, ForwardPipeline<GRAPHICS>>(res_path + "shaders/forward") {
     this->use(ctx);
     _tex = this->add_sampler("tex_diffuse");
     _ntex = this->add_sampler("tex_normal");
