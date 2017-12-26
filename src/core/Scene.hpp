@@ -3,6 +3,7 @@
 
 #include "backends/blueprints/Platform.hpp"
 #include "core/Screen.hpp"
+#include <memory>
 
 namespace Kvant {
 template <typename CONTEXT> class Scene {
