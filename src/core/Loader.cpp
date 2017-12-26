@@ -2,9 +2,9 @@
 
 namespace Kvant {
 
-static std::vector<std::string> process_material_texture(aiMaterial *mat,
-                                                         aiTextureType type,
-                                                         std::string typeName) {
+static std::vector<std::string>
+process_material_texture(aiMaterial *mat, aiTextureType type,
+                         const std::string &typeName) {
   std::vector<std::string> textures;
 
   for (unsigned int t = 0; t < mat->GetTextureCount(type); t++) {
