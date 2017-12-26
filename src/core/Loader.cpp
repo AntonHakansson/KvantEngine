@@ -91,6 +91,7 @@ static void process_node(RawModelData *model_data, const aiScene *scene,
     process_node(model_data, scene, node->mChildren[i]);
   }
 }
+
 RawModelData read_model(const char *filename) {
   RawModelData model_data;
 
@@ -100,7 +101,8 @@ RawModelData read_model(const char *filename) {
   const aiScene *scene =
       importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_FlipUVs);
   if (!scene) {
-    throw std::runtime_error("Failed to load model " + std::string(filename));
+    auto errStr = importer.GetErrorString();
+    throw std::runtime_error("Failed to load model " + std::string(filename) + " : " + errStr);
   }
 
   process_node(&model_data, scene, scene->mRootNode);
