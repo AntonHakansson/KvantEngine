@@ -6,17 +6,25 @@
 #include <glm/glm.hpp>
 
 #include "core/Traits.hpp"
-#include "core/Loader.hpp"
 #include "core/Mesh.hpp"
 #include "backends/blueprints/Graphics.hpp"
+#include "core/Loader.cpp"
 
 namespace Kvant {
 
     template <typename GRAPHICS, typename ACTUAL>
     class Drawable : public IsDrawable<ACTUAL> {
         public:
-            Drawable(const GraphicsContext<GRAPHICS>& ctx, std::string filename,
-                     std::function<std::unique_ptr<Model>(const char* filename)> loader = read_smd);
+            Drawable(const GraphicsContext<GRAPHICS>& ctx, std::string filename) {
+                auto model_data = read_model(filename.c_str());
+                load_model_data(ctx, model_data);
+            }
+            Drawable(const GraphicsContext<GRAPHICS>& ctx, const RawModelData& model_data) {
+                load_model_data(ctx, model_data);
+                LOG_DEBUG << "Successfully loaded data " << model_data.diffuses.size() << ", "
+                                                        << model_data.normals.size() << ", "
+                                                        << model_data.speculars.size();
+            }
             
             virtual ~Drawable() {}
 
@@ -30,20 +38,14 @@ namespace Kvant {
                                 const glm::mat4* transforms, int count) const;
 
         private:
+            void load_model_data(const GraphicsContext<GRAPHICS>& ctx, const RawModelData& model_data) {
+                for (auto& m : model_data.model.meshes) {
+                    auto s = std::make_unique<typename GRAPHICS::Surface>(ctx, m.get());
+                    _surfaces.push_back(std::move(s));
+                }
+            }
             std::vector<std::unique_ptr<Kvant::blueprints::graphics::Surface<GRAPHICS, typename GRAPHICS::Surface>>> _surfaces;
     };
-
-
-    template <typename GRAPHICS, typename ACTUAL>
-    Drawable<GRAPHICS, ACTUAL>::Drawable(const GraphicsContext<GRAPHICS>& ctx, std::string filename,
-                                         std::function<std::unique_ptr<Model>(const char* filename)> loader) {
-        auto model = loader(filename.c_str());
-        for (auto& m : model->meshes) {
-            auto s = std::make_unique<typename GRAPHICS::Surface>(ctx, m.get());
-            _surfaces.push_back(std::move(s));
-        }
-    }
-
 
     template <typename GRAPHICS, typename ACTUAL>
     template <typename PIPELINE>
