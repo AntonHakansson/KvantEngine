@@ -1,4 +1,2 @@
 #include "backends/opengl/Opengl.hpp"
-namespace Kvant {
-
-}
+namespace Kvant {}
