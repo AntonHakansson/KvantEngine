@@ -26,6 +26,7 @@ set(SOURCE_FILES
      ${SOURCE_FILES}
         src/utils/Logger.hpp
         src/core/Loader.cpp
+        src/core/Animation.cpp
         src/imgui/imgui.cpp
         src/imgui/imgui_draw.cpp
         src/imgui/imgui_kvant.cpp
@@ -46,10 +47,17 @@ target_include_directories(KvantEngine
     src/core
     src/utils
     src/imgui
+
+    libs/assimp-3.1.1/include/ 
 )
 
 set (COMMON_LIBS
-        ${BACKEND_LIBS})
+        ${BACKEND_LIBS}
+        assimp
+)
+set(BUILD_ASSIMP_TOOLS  ON)
+set(ASSIMP_BUILD_STATIC_LIB ON)
+add_subdirectory(libs/assimp-3.1.1)
 
 set (COMMON_INCLUDE_DIRS
     ${BACKEND_INCLUDE_DIRS}
