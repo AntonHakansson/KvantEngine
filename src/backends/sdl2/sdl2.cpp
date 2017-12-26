@@ -1,7 +1,9 @@
+// clang-format off
+#include "imgui/imgui.h"
+// clang-format on
 #include "backends/sdl2/sdl2.hpp"
 #include "backends/sdl2/imgui_impl_sdl.h"
 #include "core/Screen.hpp"
-#include "imgui/imgui.h"
 #include "utils/Checks.hpp"
 
 namespace Kvant::platform::sdl {

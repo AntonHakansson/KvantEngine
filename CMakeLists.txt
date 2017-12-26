@@ -24,13 +24,13 @@ endif()
 
 set(SOURCE_FILES
      ${SOURCE_FILES}
-        src/utils/Logger.hpp
         src/core/Loader.cpp
         src/core/Animation.cpp
         src/imgui/imgui.cpp
         src/imgui/imgui_draw.cpp
         src/imgui/imgui_kvant.cpp
-            src/utils/lodepng.cpp)
+            src/utils/lodepng.cpp
+)
 
 add_library(
     KvantEngine STATIC
@@ -47,7 +47,6 @@ target_include_directories(KvantEngine
     src/core
     src/utils
     src/imgui
-
     libs/assimp-3.1.1/include/ 
 )
 
