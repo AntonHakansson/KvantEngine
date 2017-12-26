@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "core/Context.hpp"
+#include "core/Loader.hpp"
 #include "utils/Checks.hpp"
 
 namespace Kvant::graphics::opengl {
